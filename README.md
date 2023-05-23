@@ -1,16 +1,46 @@
-# chrome-extension
+# Getting Started with Create React App
 
-# Disclaimer: This code is not intended to be used as is, but rather modified / referenced for your assignment.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-This template is intended for COEN 296A: Attention Management Tools, Assignment 3.
+## Available Scripts
 
-To load an unpacked extension in developer mode:
-1. Go to the Extensions page by entering chrome://extensions in a new tab. (By design chrome:// URLs are not linkable.)
-    -> Alternatively, click on the Extensions menu puzzle button and select Manage Extensions at the bottom of the menu.
-    -> Or, click the Chrome menu, hover over More Tools, then select Extensions.
-2. Enable Developer Mode by clicking the toggle switch next to Developer mode.
-3. Click the Load unpacked button and select the extension directory.
+In the project directory, you can run:
 
-![alt text](https://user-images.githubusercontent.com/36625317/233700422-adeff59a-a61c-4835-94ee-aba861cd6d9f.png)
+### `npm start`
 
-Ta-da! The extension has been successfully installed. Because no extension icons were included in the manifest, a generic icon will be created for the extension.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
