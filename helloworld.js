@@ -1,9 +1,11 @@
 /*
-    * This is a sample content script that will run on the pages specified in the manifest.
-*/
+ * This is a sample content script that will run on the pages specified in the manifest.
+ */
 
 // Remove the youtube home feed
-document.querySelector('ytd-browse[role="main"][page-subtype="home"] #contents').remove();
+document
+  .querySelector('ytd-browse[role="main"][page-subtype="home"] #contents')
+  .remove();
 
 // Create a new <p> element
 var message = document.createElement("p");
