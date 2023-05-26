@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "js": ["helloworld.js"],
+      "js": ["block.js"],
       "matches": ["https://www.youtube.com/*"]
     }
   ],
