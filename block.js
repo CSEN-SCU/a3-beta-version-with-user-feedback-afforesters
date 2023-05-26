@@ -19,6 +19,11 @@ function blockScreen() {
   blockerDiv.style.zIndex = "9999";
 
   const img = document.createElement("img");
+  img.style.position = "fixed";
+  img.style.top = "50%";
+  img.style.left = "50%";
+  img.style.transform = "translate(-50%, -50%)";
+  img.style.zIndex = "10000";
   img.src =
     "https://www.shutterstock.com/image-vector/times-red-sign-vector-illustration-260nw-1338912215.jpg";
 
