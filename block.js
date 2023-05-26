@@ -29,5 +29,5 @@ function blockScreen() {
 
   // Add the div element to the page
   document.body.appendChild(blockerDiv);
-  document.body.appendChild(pic);
+  document.body.appendChild(img);
 }
