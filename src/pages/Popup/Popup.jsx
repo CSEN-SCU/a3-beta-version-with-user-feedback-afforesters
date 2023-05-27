@@ -8,32 +8,37 @@ const Popup = () => {
   const [min, setMin] = useState(0);
   const [priority, setPriority] = useState('');
   const [title, setTitle] = useState('');
-  
+  const [currFocus, setCurrFocus] = useState('');
+
   const handleClick = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
-      chrome.tabs.group({ tabIds: tabId }, groupId => {
-        chrome.runtime.sendMessage({
-          cmd: 'setPriority',
-          priority: priority,
-          groupId: groupId,
-          tabId: tabId
-        }, response => {
-          // Handle response.
-        });
+      chrome.tabs.group({ tabIds: tabId }, (groupId) => {
+        chrome.runtime.sendMessage(
+          {
+            cmd: 'setPriority',
+            priority: priority,
+            groupId: groupId,
+            tabId: tabId,
+          },
+          (response) => {
+            // Handle response.
+          }
+        );
       });
     });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       var currentURL = tabs[0].url;
-      const re = new RegExp("^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)");
+      const re = new RegExp(
+        '^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)'
+      );
       const domainName = re.exec(currentURL)[1];
-      setTitle(domainName)
+      setTitle(domainName);
     });
-  },[])
-
+  }, []);
 
   return (
     <div className="App">
@@ -41,11 +46,27 @@ const Popup = () => {
         <h1 className="App-title">{title}</h1>
       </header>
       <Timer />
-      <EditCard title={'Add Maximum'} value={max} setValue={setMax} />
-      <EditCard title={'Edit Minimum'} value={min} setValue={setMin} />
+
+      <EditCard
+        title={'Add Maximum'}
+        name="max"
+        value={max}
+        setValue={setMax}
+        currFocus={currFocus}
+        setCurrFocus={setCurrFocus}
+      />
+
+      <EditCard
+        title={'Edit Minimum'}
+        name="min"
+        value={min}
+        setValue={setMin}
+        currFocus={currFocus}
+        setCurrFocus={setCurrFocus}
+      />
 
       <div>
-        <select value={priority} onChange={e => setPriority(e.target.value)}>
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
           <option value="">--Select a Priority--</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
