@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Timer from './Timer';
 import EditCard from './EditCard';
 import './Popup.css';
@@ -7,7 +7,8 @@ const Popup = () => {
   const [max, setMax] = useState(0);
   const [min, setMin] = useState(0);
   const [priority, setPriority] = useState('');
-
+  const [title, setTitle] = useState('');
+  
   const handleClick = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       const tabId = tabs[0].id;
@@ -24,11 +25,20 @@ const Popup = () => {
     });
   };
 
+  useEffect(()=>{
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      var currentURL = tabs[0].url;
+      const re = new RegExp("^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)");
+      const domainName = re.exec(currentURL)[1];
+      setTitle(domainName)
+    });
+  },[])
+
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="App-title">Reddit</h1>
+        <h1 className="App-title">{title}</h1>
       </header>
       <Timer />
       <EditCard title={'Add Maximum'} value={max} setValue={setMax} />
