@@ -10,7 +10,7 @@ const styles = {
     color: `rgba(238, 229, 15, 0.77)`,
   },
   body: {
-    height: '50px',
+    height: '72px',
   },
 };
 
