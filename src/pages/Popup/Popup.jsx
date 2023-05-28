@@ -75,13 +75,13 @@ const Popup = () => {
       />
 
       <div>
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option value="">--Select a Priority--</option>
+        <select value={priority} onChange={e => setPriority(e.target.value)}>
+          <option value="">--Select a Prority--</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
-        <button onClick={handleClick}>Set Priority</button>
+        <button onClick={handleClick}>Set Pority</button>
       </div>
     </div>
   );
