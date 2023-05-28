@@ -1,11 +1,10 @@
 .edit-card {
     display: flex;
-    align-items: start;
     flex-direction: column;
-    background: rgba(217, 217, 217, 0.3);
-    border: 3px solid rgba(0, 0, 0, 0.44);
+    align-items: start;
     border-radius: 16px;
     margin-bottom: 10px;
+    border: 3px solid rgb(255, 255, 255),
   }
   
   .edit-title {
@@ -22,6 +21,7 @@
   
   .time-input {
     display: inline-flex;
+    flex-direction: row;
     align-items: center;
     background: #d9d9d9;
     border-radius: 16px;
@@ -31,10 +31,11 @@
     font-style: normal;
     font-weight: 600;
     font-size: 36px;
-  
     text-align: center;
     color: #000000;
     margin-left: 5px;
+    padding-right: 20px;
+    margin-right: 15px;
   }
   
   .edit-title {
@@ -59,7 +60,11 @@
   .svg-btn{
     /* background-color: aqua; */
   }
+
+  #svg-btn-plus{
+    width: 65px;
+  }
   
   #svg-btn-minus{
-    margin-left: 10px;
+
   }

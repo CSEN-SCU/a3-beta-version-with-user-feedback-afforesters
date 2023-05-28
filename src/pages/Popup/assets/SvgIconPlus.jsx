@@ -2,28 +2,20 @@ import React from 'react';
 
 const SvgIconPlus = () => (
   <svg
-    width="64"
-    height="65"
-    viewBox="0 0 64 65"
+    width="77"
+    height="77"
+    viewBox="0 0 77 77"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <rect
-      x="25.5615"
-      y="0.819"
+      x="6.73926"
+      y="45.0652"
       width="12.7487"
       height="63.7435"
       rx="6.37435"
-      fill="#87E84B"
-    />
-    <rect
-      x="63.8076"
-      y="26.3164"
-      width="12.7487"
-      height="63.7435"
-      rx="6.37435"
-      transform="rotate(90 63.8076 26.3164)"
-      fill="#87E84B"
+      transform="rotate(-90 6.73926 45.0652)"
+      fill="#E84B4B"
     />
   </svg>
 );
