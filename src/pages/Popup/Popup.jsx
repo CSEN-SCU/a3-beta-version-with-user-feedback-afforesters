@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Timer from './Timer';
 import EditCard from './EditCard';
 import './Popup.css';
@@ -9,6 +9,13 @@ const Popup = () => {
   const [priority, setPriority] = useState('');
   const [title, setTitle] = useState('');
   const [currFocus, setCurrFocus] = useState('');
+  const [time, setTime] = useState(0);
+  const [timeRange, setTimeRange] = useState(0);
+  const [timeIsUp, setTimeIsUp] = useState(false);
+
+  const timeRangeSetupHandler = useCallback((time) => {
+    setTimeRange(time);
+  }, []);
 
   const handleClick = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -45,7 +52,7 @@ const Popup = () => {
       <header className="App-header">
         <h1 className="App-title">{title}</h1>
       </header>
-      <Timer />
+      <Timer time={time} timeRange={timeRange} timeIsUp={timeIsUp} />
 
       <EditCard
         title={'Add Maximum'}
@@ -54,6 +61,7 @@ const Popup = () => {
         setValue={setMax}
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
+        setTimeRange={timeRangeSetupHandler}
       />
 
       <EditCard
@@ -63,6 +71,7 @@ const Popup = () => {
         setValue={setMin}
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
+        setTimeRange={timeRangeSetupHandler}
       />
 
       <div>

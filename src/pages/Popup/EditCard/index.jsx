@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import SvgIconClock from '../assets/SvgIconClock';
 import SvgIconPlus from '../assets/SvgIconMinus';
 import SvgIconMark from '../assets/SvgIconMark';
@@ -18,6 +18,7 @@ const EditCard = ({
   setValue,
   currFocus = '',
   setCurrFocus,
+  setTimeRange,
 }) => {
   const isFocused = useMemo(() => currFocus === name, [currFocus, name]);
 
@@ -29,6 +30,10 @@ const EditCard = ({
     setValue(parseInt(event.target.value));
   };
 
+  const startHandler = useCallback(() => {
+    setTimeRange(value);
+  }, [setTimeRange, value]);
+
   return (
     <div className="edit-card" style={isFocused ? styles.focused : {}}>
       <div className="edit-title">{title}</div>
@@ -38,6 +43,7 @@ const EditCard = ({
         </div>
         <div className="time-input">
           <input
+            disabled={!isFocused}
             id="time-input-number"
             type="number"
             min="00"
@@ -48,7 +54,9 @@ const EditCard = ({
           ></input>
           <div>m</div>
         </div>
-        <button disabled={!isFocused}>start</button>
+        <button disabled={!isFocused} onClick={startHandler}>
+          start
+        </button>
       </div>
     </div>
   );
