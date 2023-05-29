@@ -27,6 +27,21 @@ const Popup = () => {
       setTime(response.time);
       if (response.timeIsUp) {
         setTimeIsUp(true);
+        /*
+        await chrome.runtime.sendMessage({
+          cmd: 'TIME_IS_UP',
+        });
+        */
+        let queryOptions = { active: true, currentWindow: true };
+        let tab = await chrome.tabs.query(queryOptions);
+
+        chrome.tabs.sendMessage(
+          tab[0].id,
+          { cmd: "TIME_IS_UP" },
+          function (response) {
+            console.log(response.status);
+          }
+        );
         clearInterval(intervalRef.current);
       }
     }, 1000);
