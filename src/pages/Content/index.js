@@ -1,5 +1,5 @@
 import { printLine } from './modules/print';
-import { timer } from './background/index.js';
+import { timer } from '../Background/index';
 
 console.log('Content script works!');
 console.log('Must reload extension for modifications to take effect.');
@@ -20,7 +20,7 @@ const timerDuration = 5000; // 5 seconds
 // Perform the screen blocking after the timer is up
 setTimeout(() => {
   blockScreen();
-}, timer.time);
+}, timerDuration);
 
 // Function to block the screen
 function blockScreen() {
