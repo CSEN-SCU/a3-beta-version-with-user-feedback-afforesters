@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Timer from './Timer';
 import EditCard from './EditCard';
+import { extractDomainName } from './utils/domainName';
 import './Popup.css';
 
 const Popup = () => {
@@ -32,47 +33,37 @@ const Popup = () => {
   const handleClick = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
-      chrome.tabs.group({ tabIds: tabId }, (groupId) => {
-        chrome.runtime.sendMessage(
-          {
-            cmd: 'setPriority',
-            priority: priority,
-            groupId: groupId,
-            tabId: tabId,
-          },
-          (response) => {
-            // Handle response.
-          }
-        );
-      });
+      chrome.runtime.sendMessage(
+        {
+          cmd: 'setPriority',
+          priority: priority,
+          tabId: tabId,
+        },
+        (response) => {
+          // Handle response.
+        }
+      );
     });
   };
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      var currentURL = tabs[0].url;
-      const re = new RegExp(
-        '^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)'
-      );
-      const domainName = re.exec(currentURL)[1];
+      const domainName = extractDomainName(tabs[0].url);
       setTitle(domainName);
+
       // save current tab id to tabIdRef
       tabIdRef.current = tabs[0].id;
 
-      intervalRef.current = setInterval(() => {
-        chrome.runtime.sendMessage(
-          {
-            cmd: 'GET_TIME',
-            domainName: domainName,
-          },
-          (response) => {
-            setTime(response.time);
-            if (response.timeIsUp) {
-              setTimeIsUp(true);
-              clearInterval(intervalRef.current);
-            }
-          }
-        );
+      intervalRef.current = setInterval(async () => {
+        const response = await chrome.runtime.sendMessage({
+          cmd: 'GET_TIME',
+          domainName: domainName,
+        });
+        setTime(response.time);
+        if (response.timeIsUp) {
+          setTimeIsUp(true);
+          clearInterval(intervalRef.current);
+        }
       }, 1000);
     });
 
