@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Timer from './Timer';
 import EditCard from './EditCard';
 import './Popup.css';
@@ -13,9 +13,21 @@ const Popup = () => {
   const [timeRange, setTimeRange] = useState(0);
   const [timeIsUp, setTimeIsUp] = useState(false);
 
-  const timeRangeSetupHandler = useCallback((time) => {
-    setTimeRange(time);
-  }, []);
+  const tabIdRef = useRef();
+  const intervalRef = useRef(null);
+
+  const startTimer = useCallback(
+    (_time) => {
+      setTimeRange(_time);
+      chrome.runtime.sendMessage({
+        cmd: 'START_TIMER',
+        domainName: title,
+        timeRange: _time,
+        tabId: tabIdRef.current,
+      });
+    },
+    [title]
+  );
 
   const handleClick = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -44,7 +56,27 @@ const Popup = () => {
       );
       const domainName = re.exec(currentURL)[1];
       setTitle(domainName);
+      // save current tab id to tabIdRef
+      tabIdRef.current = tabs[0].id;
+
+      intervalRef.current = setInterval(() => {
+        chrome.runtime.sendMessage(
+          {
+            cmd: 'GET_TIME',
+            domainName: domainName,
+          },
+          (response) => {
+            setTime(response.time);
+            if (response.timeIsUp) {
+              setTimeIsUp(true);
+              clearInterval(intervalRef.current);
+            }
+          }
+        );
+      }, 1000);
     });
+
+    return () => clearInterval(intervalRef.current);
   }, []);
 
   return (
@@ -61,7 +93,7 @@ const Popup = () => {
         setValue={setMax}
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
-        setTimeRange={timeRangeSetupHandler}
+        setTimeRange={startTimer}
       />
 
       <EditCard
@@ -71,11 +103,11 @@ const Popup = () => {
         setValue={setMin}
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
-        setTimeRange={timeRangeSetupHandler}
+        setTimeRange={startTimer}
       />
 
       <div>
-        <select value={priority} onChange={e => setPriority(e.target.value)}>
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
           <option value="">--Select a Prority--</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
