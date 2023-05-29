@@ -1,5 +1,3 @@
-import { request } from 'http';
-
 console.log('Running background script...');
 
 // timer
