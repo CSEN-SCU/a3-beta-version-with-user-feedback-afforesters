@@ -20,21 +20,19 @@ const Popup = () => {
   const handleClick = () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
-      chrome.tabs.group({ tabIds: tabId }, (groupId) => {
-        chrome.runtime.sendMessage(
-          {
-            cmd: 'setPriority',
-            priority: priority,
-            groupId: groupId,
-            tabId: tabId,
-          },
-          (response) => {
-            // Handle response.
-          }
-        );
-      });
+      chrome.runtime.sendMessage(
+        {
+          cmd: 'setPriority',
+          priority: priority,
+          tabId: tabId,
+        },
+        (response) => {
+          // Handle response.
+        }
+      );
     });
   };
+
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
