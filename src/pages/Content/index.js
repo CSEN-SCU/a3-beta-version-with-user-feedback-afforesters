@@ -10,3 +10,5 @@ printLine("Using the 'printLine' function from the Print Module");
 //     alert('time is up!!!');
 //   }
 // });
+
+// when there is a minimum time limit or maximum time limit then popup a black screen
