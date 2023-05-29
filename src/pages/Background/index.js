@@ -154,3 +154,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     getTimeReqHandler(request, sendResponse);
   }
 });
+
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  // Load the tabs from local storage
+  chrome.storage.local.get(['tabs', 'groups', 'groupIds'], function (data) {
+    let tabs = data.tabs || {};
+    let groups = data.groups || {};
+    let groupIds = data.groupIds || {};
+    let removedTab = tabs[tabId];
+    if (removedTab) {
+      // Check if the tab was in a group
+      let groupId = removedTab.groupId;
+      if (groupId) {
+        // Remove the tab from local storage
+        delete tabs[tabId];
+
+        // Check if there are any other tabs in this group
+        let otherTabsInGroup = Object.values(tabs).some(tab => tab.groupId === groupId);
+        if (!otherTabsInGroup) {
+          // If there are no other tabs in this group, remove the group
+          delete groups[groupId];
+          let groupPriority = Object.keys(groupIds).find(priority => groupIds[priority] === groupId);
+          if (groupPriority) {
+            delete groupIds[groupPriority];
+          }
+        }
+
+        // Save the updated tabs, groups, and groupIds back to local storage
+        chrome.storage.local.set({ tabs: tabs, groups: groups, groupIds: groupIds }, function () {
+          console.log('Updated tabs, groups, and groupIds after tab removal:', tabs, groups, groupIds);
+        });
+      }
+    }
+  });
+});
