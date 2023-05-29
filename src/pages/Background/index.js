@@ -55,6 +55,39 @@ const getTimeReqHandler = (request, sendResponse) => {
   }
 };
 
+
+
+
+
+// Function to update the groups status
+const updateGroupStatus = (callback) => {
+  chrome.tabs.query({}, (tabs) => {
+    let openGroupIds = tabs
+      .map(tab => tab.groupId)
+      .filter((value, index, self) => value !== chrome.tabGroups.TAB_GROUP_ID_NONE && self.indexOf(value) === index);
+
+    chrome.storage.local.get(['groups', 'groupIds'], function (data) {
+      let groupIds = data.groupIds || {};
+      let groups = data.groups || {};
+
+      for (let priority in groupIds) {
+        if (!openGroupIds.includes(groupIds[priority])) {
+          delete groups[groupIds[priority]];
+          delete groupIds[priority];
+        }
+      }
+
+      chrome.storage.local.set({ groups: groups, groupIds: groupIds }, function () {
+        console.log('Updated groups and groupIds after verification:', groups, groupIds);
+        callback();
+      });
+    });
+  });
+};
+
+
+
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('Received message:', request);
   if (request.cmd === 'setPriority') {
@@ -73,6 +106,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         color = 'grey';
     }
 
+    updateGroupStatus(() => {
     chrome.storage.local.get(['groupIds', 'groups', 'tabs'], function (data) {
       console.log('Retrieved data:', data);
 
@@ -96,7 +130,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             tabs[request.tabId] = {
               priority: request.priority,
               groupId: groupIds[request.priority],
-              // Add your other attributes here.
             };
             chrome.storage.local.set({ tabs: tabs }, function () {
               console.log('Updated tab data:', tabs);
@@ -121,12 +154,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 groups[newGroupId] = {
                   color: color,
                   title: request.priority,
-                  // Add other group properties here.
                 };
                 tabs[request.tabId] = {
                   priority: request.priority,
                   groupId: newGroupId,
-                  // Add your other attributes here.
                 };
                 chrome.storage.local.set(
                   { groupIds: groupIds, groups: groups, tabs: tabs },
@@ -146,6 +177,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         );
       }
     });
+  });
 
     return true; // Keeps the message channel open while waiting for async response.
   } else if (request.cmd === 'START_TIMER') {
