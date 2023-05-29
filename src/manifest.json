@@ -47,6 +47,7 @@
     "activeTab",
     "scripting",
     "tabs",
+    "tabGroups",
     "http://*/*",
     "https://*/*",
     "<all_urls>"
