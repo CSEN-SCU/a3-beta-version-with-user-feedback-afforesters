@@ -50,6 +50,8 @@ const getTimeReqHandler = (request, sendResponse) => {
   if (domainName === timer.id) {
     const diff = minutesDiff(currTime, timer.startTime);
     sendResponse({ time: diff, timeIsUp: diff >= timer.timeRange });
+  } else {
+    sendResponse({ time: 0, timeIsUp: false });
   }
 };
 

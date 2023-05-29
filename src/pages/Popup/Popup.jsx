@@ -8,7 +8,7 @@ const Popup = () => {
   const [max, setMax] = useState(0);
   const [min, setMin] = useState(0);
   const [priority, setPriority] = useState('');
-  const [title, setTitle] = useState('');
+  const [domainName, setDomainName] = useState('');
   const [currFocus, setCurrFocus] = useState('');
   const [time, setTime] = useState(0);
   const [timeRange, setTimeRange] = useState(0);
@@ -17,17 +17,33 @@ const Popup = () => {
   const tabIdRef = useRef();
   const intervalRef = useRef(null);
 
+  // subscribe Timer and keep update timer on popup page
+  const subscribeTimer = (domainName) => {
+    intervalRef.current = setInterval(async () => {
+      const response = await chrome.runtime.sendMessage({
+        cmd: 'GET_TIME',
+        domainName: domainName,
+      });
+      setTime(response.time);
+      if (response.timeIsUp) {
+        setTimeIsUp(true);
+        clearInterval(intervalRef.current);
+      }
+    }, 1000);
+  };
+
   const startTimer = useCallback(
-    (_time) => {
+    async (_time) => {
       setTimeRange(_time);
-      chrome.runtime.sendMessage({
+      await chrome.runtime.sendMessage({
         cmd: 'START_TIMER',
-        domainName: title,
+        domainName: domainName,
         timeRange: _time,
         tabId: tabIdRef.current,
       });
+      subscribeTimer(domainName);
     },
-    [title]
+    [domainName]
   );
 
   const handleClick = () => {
@@ -46,34 +62,27 @@ const Popup = () => {
     });
   };
 
+  const init = async () => {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const _domainName = extractDomainName(tabs[0].url);
+    setDomainName(_domainName);
+    // save current tab id to tabIdRef
+    tabIdRef.current = tabs[0].id;
+
+    // todo ------
+    // if current page has running timer
+    // subscribeTimer(domainName)
+  };
+
   useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const domainName = extractDomainName(tabs[0].url);
-      setTitle(domainName);
-
-      // save current tab id to tabIdRef
-      tabIdRef.current = tabs[0].id;
-
-      intervalRef.current = setInterval(async () => {
-        const response = await chrome.runtime.sendMessage({
-          cmd: 'GET_TIME',
-          domainName: domainName,
-        });
-        setTime(response.time);
-        if (response.timeIsUp) {
-          setTimeIsUp(true);
-          clearInterval(intervalRef.current);
-        }
-      }, 1000);
-    });
-
+    init();
     return () => clearInterval(intervalRef.current);
   }, []);
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1 className="App-title">{title}</h1>
+        <h1 className="App-title">{domainName}</h1>
       </header>
       <Timer time={time} timeRange={timeRange} timeIsUp={timeIsUp} />
 
