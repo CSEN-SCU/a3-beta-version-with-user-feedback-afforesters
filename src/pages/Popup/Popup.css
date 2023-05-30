@@ -35,7 +35,7 @@
   position: relative;
   border: 1px solid #222222;
   border-radius: 8px;
-  width:45%;
+  width: 45%;
 }
 
 .box select {
@@ -49,7 +49,7 @@
   -webkit-appearance: button;
   appearance: button;
   outline: none;
-  margin-right:5px;
+  margin-right: 5px;
 }
 
 .box::before {
@@ -58,7 +58,7 @@
   top: -2px;
   right: 0;
   left: 47%;
-  width:100px;
+  width: 100px;
   height: 80%;
   text-align: center;
   font-size: 18px;
@@ -71,18 +71,53 @@
   cursor: pointer;
   color: rgb(13, 248, 115);
   background-color: rgba(255, 255, 255, 0.2);
-  
+
 }
 
 .box select option {
   padding: 30px;
 }
 
-.priority-wrapper{
-  display:inline-flex;
-
+.priority-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.priority-wrapper > *{
+.priority-wrapper>* {
   margin: auto 2px;
+}
+
+.priority-btn-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.priority-btn-wrapper button {
+  color: white;
+  font-weight: bold;
+}
+
+.circle-button {
+  border-radius: 50%;
+  /* this makes the button circular */
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  border: none;
+  color: white;
+}
+
+.circle-button.low {
+  background-color: rgb(82, 129, 82);
+}
+
+.circle-button.medium {
+  background-color: rgb(233, 233, 65);
+}
+
+.circle-button.high {
+  background-color: rgb(196, 59, 59);
 }
