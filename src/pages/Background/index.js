@@ -11,8 +11,9 @@ const extractDomainName = (url) => {
   }
 };
 
-const timeIsUp = () => {
+const timeIsUp = async () => {
   console.log('time is up!!!!');
+  await timer.saveToStorage();
 };
 
 const startTimerReqHandler = (request) => {
@@ -160,15 +161,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-const saveCurrentTimerToStorage = async () => {
-  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
-  const timers = JSON.parse(LOCAL_TIMERS);
-  const timerKey = `timer-${timer.domainName}`;
-  timers[timerKey] = timer.copy();
-  const value = JSON.stringify(timers);
-  await chrome.storage.local.set({ LOCAL_TIMERS: value });
-};
-
 const stopAndSaveCurrentTimer = async () => {
   if (timer !== null) {
     // stop current timer
@@ -177,7 +169,7 @@ const stopAndSaveCurrentTimer = async () => {
       timer.stop();
     }
     //save timer to local storage
-    await saveCurrentTimerToStorage();
+    await timer.saveToStorage();
     timer = null; // set global timer pointer to null
     console.log('tab onActivated: stop and save last timer');
   }
@@ -274,7 +266,7 @@ class Timer {
       this.time += 1;
       if (this.time >= this.timeLimit) {
         this.callback && this.callback();
-        clearInterval(this.interval);
+        this.stop();
       }
     }, 1000);
   }
@@ -293,5 +285,14 @@ class Timer {
       timeLimit: this.timeLimit,
       type: this.type,
     };
+  }
+
+  async saveToStorage() {
+    const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
+    const timers = JSON.parse(LOCAL_TIMERS);
+    const timerKey = `timer-${this.domainName}`;
+    timers[timerKey] = this.copy();
+    const value = JSON.stringify(timers);
+    await chrome.storage.local.set({ LOCAL_TIMERS: value });
   }
 }
