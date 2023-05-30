@@ -31,7 +31,6 @@ const startTimerReqHandler = (request) => {
 
 const getTimeReqHandler = (request, sendResponse) => {
   const { domainName } = request;
-  console.log('GET_TIME', domainName);
   if (timer == null || domainName !== timer.domainName) {
     sendResponse({ time: 0, timeIsUp: false });
   } else {
@@ -191,6 +190,28 @@ chrome.windows.onRemoved.addListener(async () => {
   await stopAndSaveCurrentTimer();
 });
 
+const getUnfinishedTimer = async () => {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log('show tabs', tabs);
+
+  const domainName = extractDomainName(tabs[0].url);
+
+  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
+
+  const localTimers = JSON.parse(LOCAL_TIMERS);
+  const timerKey = `timer-${domainName}`;
+  return localTimers[timerKey];
+};
+
+const resumeUnfinishedTimer = async (previousTimer) => {
+  console.log('RESTART_TIMER', previousTimer);
+  const { domainName, tabIds, time, timeLimit, type } = previousTimer;
+  timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {
+    timeIsUp();
+  });
+  timer.start();
+};
+
 // event when activated tab changes
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   const { tabId, windowId } = activeInfo;
@@ -198,42 +219,13 @@ chrome.tabs.onActivated.addListener(async (activeInfo) => {
 
   await stopAndSaveCurrentTimer();
 
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-  console.log('show tabs', tabs);
-  const domainName = extractDomainName(tabs[0].url);
-
-  console.log('show current domainName', domainName);
-
-  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
-
-  console.log('localTimers_str: ', LOCAL_TIMERS);
-
-  const localTimers = JSON.parse(LOCAL_TIMERS);
-  const timerKey = `timer-${domainName}`;
-  const previousTimer = localTimers[timerKey];
+  const previousTimer = await getUnfinishedTimer();
 
   if (previousTimer) {
-    console.log(previousTimer);
-
-    const { domainName, tabIds, time, timeLimit, type } = previousTimer;
-    console.log('RESTART_TIMER', previousTimer);
-
-    timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {
-      timeIsUp();
-    });
-    timer.start();
+    await resumeUnfinishedTimer(previousTimer);
   } else {
     console.log('no previous timer');
   }
-
-  /**
-   * todo
-   * if (there is running timer){
-   *    stop timer
-   *    save timer
-   *
-   * }
-   */
 });
 
 class Timer {
