@@ -21,10 +21,13 @@
   flex-direction: column;
   font-size: calc(10px + 2vmin);
   color: black;
+  margin: 0px;
 }
 
 .App-title {
   font-size: 28px;
+  margin: 0px;
+  text-transform: uppercase;
 }
 
 .App-link {

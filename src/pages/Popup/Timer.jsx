@@ -9,7 +9,7 @@ const styles = {
     color: `rgba(238, 229, 15, 1)`,
   },
   body: {
-    height: '70px',
+    // height: '30px',
   },
 };
 
