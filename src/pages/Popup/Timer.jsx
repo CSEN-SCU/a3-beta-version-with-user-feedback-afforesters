@@ -23,7 +23,7 @@ const Timer = ({ time, timeRange, timeIsUp }) => {
         </h1>
       )}
 
-      {timeIsUp && <p>Maximun daily time limit reached</p>}
+      {timeIsUp && <p>Maximum daily time limit reached</p>}
     </div>
   );
 };
