@@ -72,7 +72,7 @@
 
   #svg-btn-plus:hover{
     cursor:pointer;
-    transform: rotate(360deg) scale(110%);
+    transform:  scale(108%);
 
   }
   
