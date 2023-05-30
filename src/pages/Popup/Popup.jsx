@@ -120,16 +120,19 @@ const Popup = () => {
         setCurrFocus={setCurrFocus}
         setTimeRange={startTimer}
       />
-
-      <div>
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option value="">--Select a Priority--</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-        <button onClick={handleClick}>Set Priority</button>
+      <div className = 'priority-wrapper'>
+        <div className='box'>
+          <select  value={priority} onChange={(e) => setPriority(e.target.value)}>
+            <option value="">--Select a Priority--</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+          
+        </div>
+        <button className='button-23' role='button' onClick={handleClick}>Set Priority</button>
       </div>
+      
     </div>
   );
 };

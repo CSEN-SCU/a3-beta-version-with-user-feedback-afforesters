@@ -1,13 +1,15 @@
 console.log('Running background script...');
 
 // timer
-let timer = {
+let timer_model = {
   id: '',
   startTime: null,
   time: 0,
   timeRange: 0,
   tabIds: [],
 };
+
+let timer = timer_model
 
 let timerInterval;
 
@@ -47,7 +49,7 @@ const getTimeReqHandler = (request, sendResponse) => {
   console.log('GET_TIME', domainName);
   const currTime = new Date();
 
-  if (domainName === timer.id) {
+  if (domainName === timer.id && timer.startTime != null) {
     const diff = minutesDiff(currTime, timer.startTime);
     sendResponse({ time: diff, timeIsUp: diff >= timer.timeRange });
   } else {
@@ -55,8 +57,19 @@ const getTimeReqHandler = (request, sendResponse) => {
   }
 };
 
-
-
+const setTimeBlock = () =>{
+  console.log('sending block message ...')
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) =>{
+    console.log
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      { cmd: "TIME_IS_UP" },
+      function (response) {
+        console.log(response.status);
+      }
+    )
+  })
+};
 
 
 // Function to update the groups status
@@ -184,6 +197,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     startTimeReqHandler(request);
   } else if (request.cmd === 'GET_TIME') {
     getTimeReqHandler(request, sendResponse);
+  } else if (request.cmd === 'TIME_IS_UP'){
+    setTimeBlock();
+   
+  }
+  else if (request.cmd === 'RESET_TIME' && request.from != 'content'){
+    console.log("received RESET_TIME FROM POPUP ..." )
+    timer = timer_model;
+    sendResponse({ time: 0, timeIsUp: false });
   }
 });
 

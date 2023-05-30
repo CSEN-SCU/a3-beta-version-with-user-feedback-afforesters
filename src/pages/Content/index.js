@@ -33,25 +33,52 @@ function blockScreen() {
   // Add the div element to the page
 
   const unblockDiv = document.createElement('button');
-  unblockDiv.classList.add('button-container-div');
+  unblockDiv.classList.add('rainbow');
   unblockDiv.textContent = 'Close Tab';
   unblockDiv.style.position = 'absolute';
   unblockDiv.style.textAlign = 'center';
-  unblockDiv.style.border = '4px solid coral';
   unblockDiv.style.height = '10vh';
   unblockDiv.style.width = '10vh';
   unblockDiv.style.zIndex = '10001';
   unblockDiv.style.top = '20%';
-  unblockDiv.style.left = '47%';
+  unblockDiv.style.left = '50%';
   unblockDiv.style.margin = '0';
-  unblockDiv.style.backgroundColor = 'white';
+  unblockDiv.style.transform = 'translate(-50%, -50%)';
+
+  const unblockDiv2 = document.createElement('button');
+  unblockDiv2.classList.add('rainbow');
+  unblockDiv2.textContent = 'Reset Timer';
+  unblockDiv2.style.position = 'absolute';
+  unblockDiv2.style.textAlign = 'center';
+  unblockDiv2.style.height = '10vh';
+  unblockDiv2.style.width = '10vh';
+  unblockDiv2.style.zIndex = '10001';
+  unblockDiv2.style.top = '80%';
+  unblockDiv2.style.left = '50%';
+  unblockDiv2.style.margin = '0';
+  unblockDiv2.style.transform = 'translate(-50%, -50%)';
+  //unblockDiv.style.backgroundColor = 'white';
   // Add event listener to the button
   unblockDiv.addEventListener('click', () => {
     // Close the current tab
     window.close();
   });
 
+  unblockDiv2.addEventListener('click', async () => {
+    // Close the current tab
+    document.body.removeChild(blockerDiv);
+    document.body.removeChild(img);
+    document.body.removeChild(unblockDiv);
+    document.body.removeChild(unblockDiv2);
+
+    await chrome.runtime.sendMessage({
+      from: 'content',
+      cmd: 'RESET_TIMER',
+    });
+  });
+
   document.body.appendChild(blockerDiv);
   document.body.appendChild(img);
   document.body.appendChild(unblockDiv);
+  document.body.appendChild(unblockDiv2);
 }

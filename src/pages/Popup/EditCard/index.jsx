@@ -54,7 +54,7 @@ const EditCard = ({
           ></input>
           <div>m</div>
         </div>
-        <button disabled={!isFocused} onClick={startHandler}>
+        <button className ="button-23" role="button"disabled={!isFocused} onClick={startHandler}>
           start
         </button>
       </div>
