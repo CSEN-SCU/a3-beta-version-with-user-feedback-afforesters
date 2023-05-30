@@ -1,43 +1,29 @@
 console.log('Running background script...');
 
-// timer
-let timer = {
-  id: '',
-  startTime: null,
-  time: 0,
-  timeRange: 0,
-  tabIds: [],
+let timer = null;
+
+const extractDomainName = (url) => {
+  if (url === '') {
+    return '';
+  } else {
+    const re = new RegExp('^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)');
+    return re.exec(url)[1];
+  }
 };
 
-let timerInterval;
-
-function minutesDiff(date1, date2) {
-  var diff = (date1.getTime() - date2.getTime()) / 1000;
-  diff /= 60;
-  return Math.abs(Math.round(diff));
-}
-
-const startTimer = () => {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    const currTime = new Date();
-    if (minutesDiff(currTime, timer.startTime) >= timer.timeRange) {
-      console.log('time is up!!!!');
-      // todo - save data to local storage
-
-      clearInterval(timerInterval);
-    }
-  }, 1000);
+const timeIsUp = () => {
+  console.log('time is up!!!!');
 };
 
-const startTimeReqHandler = (request) => {
-  const { domainName, timeRange, tabId } = request;
+const startTimerReqHandler = (request) => {
+  const { domainName, timeRange, tabId, timerType } = request;
   console.log('START_TIMER', domainName, timeRange, tabId);
 
-  timer.startTime = new Date();
-  timer.id = domainName;
-  timer.timeRange = timeRange;
-  startTimer();
+  timer = new Timer(domainName, [tabId], 0, timeRange, timerType, () => {
+    timeIsUp();
+  });
+  timer.start();
+
   // todo save to local storage
   //
 };
@@ -45,13 +31,27 @@ const startTimeReqHandler = (request) => {
 const getTimeReqHandler = (request, sendResponse) => {
   const { domainName } = request;
   console.log('GET_TIME', domainName);
-  const currTime = new Date();
-
-  if (domainName === timer.id) {
-    const diff = minutesDiff(currTime, timer.startTime);
-    sendResponse({ time: diff, timeIsUp: diff >= timer.timeRange });
-  } else {
+  if (timer == null || domainName !== timer.domainName) {
     sendResponse({ time: 0, timeIsUp: false });
+  } else {
+    const { time, timeIsUp } = timer.getTime();
+    console.log('current time', time, timeIsUp);
+    sendResponse({ time, timeIsUp });
+  }
+};
+
+const checkTimerExistHandler = (request, sendResponse) => {
+  const { domainName } = request;
+  if (timer && timer.domainName === domainName) {
+    console.log('isTimerExist', true);
+    sendResponse({
+      isTimerExist: true,
+      timeLimit: timer.timeLimit,
+      timerType: timer.type,
+    });
+  } else {
+    console.log('isTimerExist', false);
+    sendResponse({ isTimerExist: false });
   }
 };
 
@@ -149,8 +149,149 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true; // Keeps the message channel open while waiting for async response.
   } else if (request.cmd === 'START_TIMER') {
-    startTimeReqHandler(request);
+    startTimerReqHandler(request);
+    // return true;
   } else if (request.cmd === 'GET_TIME') {
     getTimeReqHandler(request, sendResponse);
+    // return true;
+  } else if (request.cmd === 'CHECK_IS_TIMER_EXIST') {
+    checkTimerExistHandler(request, sendResponse);
+    return true;
   }
 });
+
+const saveCurrentTimerToStorage = async () => {
+  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
+  const timers = JSON.parse(LOCAL_TIMERS);
+  const timerKey = `timer-${timer.domainName}`;
+  timers[timerKey] = timer.copy();
+  const value = JSON.stringify(timers);
+  await chrome.storage.local.set({ LOCAL_TIMERS: value });
+};
+
+const stopAndSaveCurrentTimer = async () => {
+  if (timer !== null) {
+    // stop current timer
+    if (timer.status) {
+      // if timer is running
+      timer.stop();
+    }
+    //save timer to local storage
+    await saveCurrentTimerToStorage();
+    timer = null; // set global timer pointer to null
+    console.log('tab onActivated: stop and save last timer');
+  }
+};
+
+chrome.runtime.onInstalled.addListener(async () => {
+  // init localtimers in chrome local storage
+  const hashmap = {};
+  await chrome.storage.local.set({ LOCAL_TIMERS: JSON.stringify(hashmap) });
+  console.log('init LOCAL_TIMER in chrome local storage');
+});
+
+// event when tab is closed
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+  console.log('tab closed: ', tabId);
+});
+
+chrome.windows.onRemoved.addListener(async () => {
+  await stopAndSaveCurrentTimer();
+});
+
+// event when activated tab changes
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const { tabId, windowId } = activeInfo;
+  console.log('tab onActivated: ', tabId, windowId);
+
+  await stopAndSaveCurrentTimer();
+
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log('show tabs', tabs);
+  const domainName = extractDomainName(tabs[0].url);
+
+  console.log('show current domainName', domainName);
+
+  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
+
+  console.log('localTimers_str: ', LOCAL_TIMERS);
+
+  const localTimers = JSON.parse(LOCAL_TIMERS);
+  const timerKey = `timer-${domainName}`;
+  const previousTimer = localTimers[timerKey];
+
+  if (previousTimer) {
+    console.log(previousTimer);
+
+    const { domainName, tabIds, time, timeLimit, type } = previousTimer;
+    console.log('RESTART_TIMER', previousTimer);
+
+    timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {
+      timeIsUp();
+    });
+    timer.start();
+  } else {
+    console.log('no previous timer');
+  }
+
+  /**
+   * todo
+   * if (there is running timer){
+   *    stop timer
+   *    save timer
+   *
+   * }
+   */
+});
+
+class Timer {
+  constructor(
+    domainName = '',
+    tabIds = [],
+    time = 0,
+    timeLimit = 25 * 60,
+    type = 'max', // timer type 'max' | 'min'
+    callback = () => {} // callback when time is up
+  ) {
+    this.domainName = domainName;
+    this.tabIds = tabIds;
+    this.time = time; // unit second
+    this.timeLimit = timeLimit;
+    this.type = type;
+    this.interval = null;
+    this.callback = callback;
+    this.status = false; // time status, running -> true , stop -> false
+  }
+
+  getTime() {
+    return { time: this.time, timeIsUp: this.time >= this.timeLimit };
+  }
+
+  start() {
+    clearInterval(this.interval);
+    this.status = true; // show timer is running
+    this.interval = setInterval(() => {
+      this.time += 1;
+      if (this.time >= this.timeLimit) {
+        this.callback && this.callback();
+        clearInterval(this.interval);
+      }
+    }, 1000);
+  }
+
+  stop() {
+    clearInterval(this.interval);
+    this.status = false; // show timer is stopped
+    return this.time;
+  }
+
+  copy() {
+    return {
+      domainName: this.domainName,
+      tabIds: this.tabIds,
+      time: this.time,
+      timeLimit: this.timeLimit,
+      type: this.type,
+    };
+  }
+}

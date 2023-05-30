@@ -18,32 +18,44 @@ const Popup = () => {
   const intervalRef = useRef(null);
 
   // subscribe Timer and keep update timer on popup page
-  const subscribeTimer = (domainName) => {
+  const subscribeTimer = useCallback(async (domainName) => {
+    const response = await chrome.runtime.sendMessage({
+      cmd: 'GET_TIME',
+      domainName: domainName,
+    });
+    const time_minute = Math.floor(response.time / 60);
+    setTime(time_minute);
     intervalRef.current = setInterval(async () => {
       const response = await chrome.runtime.sendMessage({
         cmd: 'GET_TIME',
         domainName: domainName,
       });
-      setTime(response.time);
+      const time_minute = Math.floor(response.time / 60);
+      setTime(time_minute);
       if (response.timeIsUp) {
         setTimeIsUp(true);
         clearInterval(intervalRef.current);
       }
     }, 1000);
-  };
+  }, []);
 
   const startTimer = useCallback(
     async (_time) => {
-      setTimeRange(_time);
-      await chrome.runtime.sendMessage({
-        cmd: 'START_TIMER',
-        domainName: domainName,
-        timeRange: _time,
-        tabId: tabIdRef.current,
-      });
-      subscribeTimer(domainName);
+      if (_time === 0) {
+        // do nothing
+      } else {
+        setTimeRange(_time);
+        await chrome.runtime.sendMessage({
+          cmd: 'START_TIMER',
+          domainName: domainName,
+          timeRange: _time * 60,
+          tabId: tabIdRef.current,
+          timerType: currFocus,
+        });
+        subscribeTimer(domainName);
+      }
     },
-    [domainName]
+    [currFocus, domainName, subscribeTimer]
   );
 
   const handleClick = () => {
@@ -62,22 +74,31 @@ const Popup = () => {
     });
   };
 
-  const init = async () => {
+  const init = useCallback(async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const _domainName = extractDomainName(tabs[0].url);
     setDomainName(_domainName);
     // save current tab id to tabIdRef
     tabIdRef.current = tabs[0].id;
 
-    // todo ------
-    // if current page has running timer
-    // subscribeTimer(domainName)
-  };
+    const { isTimerExist, timeLimit, timerType } =
+      await chrome.runtime.sendMessage({
+        cmd: 'CHECK_IS_TIMER_EXIST',
+        domainName: _domainName,
+      });
+
+    if (isTimerExist) {
+      subscribeTimer(_domainName);
+      setCurrFocus(timerType);
+      setTimeRange(timeLimit / 60); // seconds to minutes
+    } else {
+    }
+  }, [subscribeTimer]);
 
   useEffect(() => {
     init();
-    return () => clearInterval(intervalRef.current);
-  }, []);
+    // return () => clearInterval(intervalRef.current);
+  }, [init]);
 
   return (
     <div className="App">
