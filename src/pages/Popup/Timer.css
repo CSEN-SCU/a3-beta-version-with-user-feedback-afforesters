@@ -1,0 +1,14 @@
+.timer-counter {
+  margin-top: -10px;
+  height: 32px;
+}
+.timer-counter-no-limit {
+  font-size: 20px;
+}
+.timer-counter-number {
+  font-size: 20px;
+  font: bold;
+}
+.timer-status {
+  height: 40;
+}
