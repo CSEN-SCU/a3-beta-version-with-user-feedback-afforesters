@@ -23,7 +23,7 @@ const checkIfBlockCurrentPage = async () => {
   const timerKey = `timer-${domainName}`;
   const timer = timers[timerKey];
 
-  if (timer.time >= timer.timeLimit) {
+  if (timer.time >= timer.timeLimit && timer.type === 'max') {
     blockScreen();
     console.log('block current page');
     isBlocked = true;
