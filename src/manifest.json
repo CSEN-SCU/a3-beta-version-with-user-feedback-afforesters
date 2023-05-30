@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Mindful Tab",
-  "description": "A chrome extension boilerplate built with React 17, Webpack 5, and Webpack Dev Server 4",
+  "name": "Mindful Tabs",
+  "description": "Boost productivity by setting maximum and minimum time limits on tabs and group tabs by priority",
   "options_page": "options.html",
   "background": {
     "service_worker": "background.bundle.js"
