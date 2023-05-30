@@ -3,12 +3,42 @@ console.log('Running Content Script');
 console.log('Content script works!');
 console.log('Must reload extension for modifications to take effect.');
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.cmd === 'TIME_IS_UP') {
-    blockScreen();
-    sendResponse({ status: 'done' });
+let isBlocked = false;
+
+const extractDomainName = (url) => {
+  if (url === '') {
+    return '';
+  } else {
+    const re = new RegExp('^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)');
+    return re.exec(url)[1];
   }
-});
+};
+
+const domainName = extractDomainName(window.location.href);
+console.log('domainName', domainName);
+
+const checkIfBlockCurrentPage = async () => {
+  const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
+  const timers = JSON.parse(LOCAL_TIMERS);
+  const timerKey = `timer-${domainName}`;
+  const timer = timers[timerKey];
+
+  if (timer.time >= timer.timeLimit) {
+    blockScreen();
+    console.log('block current page');
+    isBlocked = true;
+  } else {
+    console.log('current page is not blocked');
+  }
+};
+
+checkIfBlockCurrentPage();
+
+// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//   if (request.cmd === 'TIME_IS_UP') {
+//     blockScreen();
+//   }
+// });
 
 // Function to block the screen
 function blockScreen() {
