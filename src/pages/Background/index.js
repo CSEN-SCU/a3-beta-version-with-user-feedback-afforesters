@@ -50,9 +50,9 @@ const getTimeReqHandler = (request, sendResponse) => {
   if (timer == null || domainName !== timer.domainName) {
     sendResponse({ time: 0, timeIsUp: false });
   } else {
-    const { time, timeIsUp } = timer.getTime();
+    const { time, timeIsUp, type } = timer.getTime();
     console.log('current time', time, timeIsUp);
-    sendResponse({ time, timeIsUp });
+    sendResponse({ time, timeIsUp, timerType: type });
   }
 };
 
@@ -368,15 +368,21 @@ class Timer {
   }
 
   getTime() {
-    return { time: this.time, timeIsUp: this.time >= this.timeLimit };
+    return {
+      time: this.time,
+      timeIsUp: this.time >= this.timeLimit,
+      type: this.type,
+    };
   }
 
   start() {
     clearInterval(this.interval);
     this.status = true; // show timer is running
     this.interval = setInterval(() => {
+      // increate time by 1 every second
       this.time += 1;
-      if (this.time >= this.timeLimit) {
+      // stop timer when timer type is max and it reaches it maximum,
+      if (this.time >= this.timeLimit && this.type === 'max') {
         this.callback && this.callback();
         this.stop();
       }

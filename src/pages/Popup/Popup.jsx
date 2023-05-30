@@ -13,42 +13,48 @@ const Popup = () => {
   const [time, setTime] = useState(0);
   const [timeRange, setTimeRange] = useState(0);
   const [timeIsUp, setTimeIsUp] = useState(false);
+  const [type, setType] = useState('max'); // default timer type max
 
   const tabIdRef = useRef();
   const intervalRef = useRef(null);
 
-  // subscribe Timer and keep update timer on popup page
-  const subscribeTimer = useCallback(async (domainName) => {
+  const getTime = useCallback(async (domainName) => {
     const response = await chrome.runtime.sendMessage({
       cmd: 'GET_TIME',
       domainName: domainName,
     });
     const time_minute = Math.floor(response.time / 60);
-    setTime(time_minute);
-    intervalRef.current = setInterval(async () => {
-      const response = await chrome.runtime.sendMessage({
-        cmd: 'GET_TIME',
-        domainName: domainName,
-      });
-      const time_minute = Math.floor(response.time / 60);
-      setTime(time_minute);
-      if (response.timeIsUp) {
-        setTimeIsUp(true);
 
-        // let queryOptions = { active: true, currentWindow: true };
-        // let tab = await chrome.tabs.query(queryOptions);
-
-        // chrome.tabs.sendMessage(
-        //   tab[0].id,
-        //   { cmd: "TIME_IS_UP" },
-        //   function (response) {
-        //     console.log(response.status);
-        //   }
-        // );
-        clearInterval(intervalRef.current);
-      }
-    }, 1000);
+    return { response, time_minute };
   }, []);
+
+  // subscribe Timer and keep update timer on popup page
+  const subscribeTimer = useCallback(
+    async (domainName) => {
+      const { time_minute } = await getTime(domainName);
+
+      setTime(time_minute);
+
+      if (intervalRef.current !== null) {
+        clearInterval(intervalRef.current); // clear previous interval
+      }
+
+      intervalRef.current = setInterval(async () => {
+        const { response, time_minute } = await getTime(domainName);
+        setTime(time_minute);
+        if (response.timeIsUp) {
+          setTimeIsUp(true);
+          if (response.timerType === 'max') {
+            // if timer type is max,
+            // stop this timer subscription when time is up
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+        }
+      }, 1000);
+    },
+    [getTime]
+  );
 
   const startTimer = useCallback(
     async (_time) => {
@@ -56,6 +62,7 @@ const Popup = () => {
         // do nothing
       } else {
         setTimeRange(_time);
+        setType(currFocus);
         await chrome.runtime.sendMessage({
           cmd: 'START_TIMER',
           domainName: domainName,
@@ -63,7 +70,7 @@ const Popup = () => {
           tabId: tabIdRef.current,
           timerType: currFocus,
         });
-        subscribeTimer(domainName);
+        await subscribeTimer(domainName);
       }
     },
     [currFocus, domainName, subscribeTimer]
@@ -102,13 +109,18 @@ const Popup = () => {
     if (isTimerExist) {
       subscribeTimer(_domainName);
       setCurrFocus(timerType);
+      setType(timerType);
       setTimeRange(timeLimit / 60); // seconds to minutes
+      
       if (timerType === 'max') {
         setMax(timeLimit / 60);
+        setType('max');
       } else if (timerType === 'min') {
         setMin(timeLimit / 60);
+        setType('min');
       }
     } else {
+      // do nothing
     }
   }, [subscribeTimer]);
 
@@ -122,7 +134,12 @@ const Popup = () => {
       <header className="App-header">
         <h1 className="App-title">{domainName}</h1>
       </header>
-      <Timer time={time} timeRange={timeRange} timeIsUp={timeIsUp} />
+      <Timer
+        time={time}
+        timeRange={timeRange}
+        timeIsUp={timeIsUp}
+        type={type}
+      />
 
       <EditCard
         title={'Add Maximum'}

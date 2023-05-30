@@ -1,18 +1,19 @@
 import React from 'react';
+import './Timer.css';
 
 const styles = {
   red: {
     color: `#E84B4B`,
   },
   yellow: {
-    color: `rgba(238, 229, 15, 0.77)`,
+    color: `rgba(238, 229, 15, 1)`,
   },
   body: {
-    height: '66px',
+    height: '70px',
   },
 };
 
-const Timer = ({ time, timeRange, timeIsUp }) => {
+const Timer = ({ time, timeRange, timeIsUp, type = 'max' }) => {
   return (
     <div style={styles.body}>
       {timeRange === 0 ? (
@@ -22,8 +23,9 @@ const Timer = ({ time, timeRange, timeIsUp }) => {
           {time}m/{timeRange}m
         </h1>
       )}
-
-      {timeIsUp && <p>Maximum daily time limit reached</p>}
+      {timeRange && !timeIsUp && <p>Running...</p>}
+      {timeIsUp && type === 'max' && <p>Maximum daily time limit reached</p>}
+      {timeIsUp && type === 'min' && <p>Minimum daily time reached</p>}
     </div>
   );
 };

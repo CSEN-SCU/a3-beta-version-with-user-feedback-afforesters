@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import SvgIconClock from '../assets/SvgIconClock';
 import SvgIconPlus from '../assets/SvgIconMinus';
 import SvgIconMark from '../assets/SvgIconMark';
 import './index.css';
@@ -54,7 +53,11 @@ const EditCard = ({
           ></input>
           <div>m</div>
         </div>
-        <button className ="button-23" role="button"disabled={!isFocused} onClick={startHandler}>
+        <button
+          className="button-23"
+          disabled={!isFocused}
+          onClick={startHandler}
+        >
           start
         </button>
       </div>
