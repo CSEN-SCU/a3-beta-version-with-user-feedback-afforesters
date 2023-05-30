@@ -91,6 +91,11 @@ const Popup = () => {
       subscribeTimer(_domainName);
       setCurrFocus(timerType);
       setTimeRange(timeLimit / 60); // seconds to minutes
+      if (timerType === 'max') {
+        setMax(timeLimit / 60);
+      } else if (timerType === 'min') {
+        setMin(timeLimit / 60);
+      }
     } else {
     }
   }, [subscribeTimer]);
