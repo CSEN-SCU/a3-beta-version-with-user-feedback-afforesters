@@ -1,0 +1,47 @@
+.priority-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.priority-wrapper>* {
+    margin: auto 2px;
+}
+
+.priority-btn-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.priority-btn-wrapper button {
+    color: white;
+    font-weight: bold;
+}
+
+.circle-button {
+    border-radius: 50%;
+    /* this makes the button circular */
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    border: none;
+    color: white;
+}
+
+.circle-button.low {
+    background-color: rgb(82, 129, 82);
+}
+
+.circle-button.medium {
+    background-color: rgb(233, 233, 65);
+}
+
+.circle-button.high {
+    background-color: rgb(196, 59, 59);
+}
+
+.circle-button.selected {
+    border: 2px solid #000;
+}

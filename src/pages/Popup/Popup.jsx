@@ -3,6 +3,7 @@ import Timer from './Timer';
 import EditCard from './EditCard';
 import { extractDomainName } from './utils/domainName';
 import './Popup.css';
+import PriorityButtons from './SetPriority/priority';
 
 const Popup = () => {
   const [max, setMax] = useState(0);
@@ -111,7 +112,7 @@ const Popup = () => {
       setCurrFocus(timerType);
       setType(timerType);
       setTimeRange(timeLimit / 60); // seconds to minutes
-      
+
       if (timerType === 'max') {
         setMax(timeLimit / 60);
         setType('max');
@@ -160,40 +161,8 @@ const Popup = () => {
         setCurrFocus={setCurrFocus}
         setTimeRange={startTimer}
       />
-      <div className="priority-wrapper">
-        <h2 style={{ textAlign: 'left' }}>Set Tab Priority</h2>
-        <div className='priority-btn-wrapper'>
-          <button
-            className="circle-button low"
-            onClick={() => {
-              setPriority("low");
-              handleClick("low");
-            }}
-          >
-            Low
-          </button>
-          <button
-            className="circle-button medium"
-            onClick={() => {
-              setPriority("medium");
-              handleClick("medium");
-            }}
-          >
-            Med
-          </button>
-          <button
-            className="circle-button high"
-            onClick={() => {
-              setPriority("high");
-              handleClick("high");
-            }}
-          >
-            High
-          </button>
-        </div>
-      </div>
 
-
+      <PriorityButtons priority={priority} setPriority={setPriority} handleClick={handleClick} />
     </div>
   );
 };

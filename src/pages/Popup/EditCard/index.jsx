@@ -53,7 +53,7 @@ const EditCard = ({
             defaultValue={0}
             onChange={inputHandler}
           ></input>
-          <div>m</div>
+          <p>m</p>
         </div>
         <button
           className="button-23"

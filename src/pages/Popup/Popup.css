@@ -26,7 +26,7 @@
 
 .App-title {
   font-size: 28px;
-  margin: 0px;
+  margin-top: 1rem;
   text-transform: uppercase;
 }
 
@@ -123,4 +123,8 @@
 
 .circle-button.high {
   background-color: rgb(196, 59, 59);
+}
+
+.circle-button.selected {
+  border: 2px solid #000;
 }

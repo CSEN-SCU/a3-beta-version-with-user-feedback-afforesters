@@ -32,22 +32,24 @@
   align-items: center;
   background: #d9d9d9;
   border-radius: 16px;
-  width: 120px;
-  height: 120px;
-  font-family: 'Inter';
+  width: 8rem;
+  min-height: 4rem;
+  font-family: 'Arial';
   font-style: normal;
   font-weight: 600;
   font-size: 36px;
   text-align: center;
   color: #000000;
   margin-left: 5px;
-  padding-right: 20px;
+  /* padding-right: 20px; */
   margin-right: 15px;
 }
 
-.time-input div {
-  position: absolute;
-  margin-left: 50%;
+.time-input p {
+  /* font-family: 'Arial'; */
+  margin: 0;
+  /* position: absolute; */
+  /* margin-left: 50%; */
 }
 
 
@@ -57,8 +59,10 @@
   background-color: transparent;
   font-weight: 600;
   font-size: 36px;
-  flex: 2;
-  margin-left: 10px;
+  /* flex: 2; */
+  width: auto;
+  text-align: center;
+  /* margin-left: 10px; */
 }
 
 .svg-btn {
