@@ -1,7 +1,5 @@
 import React from 'react';
 
-//import './Timer.css';
-
 const styles = {
   red: {
     color: `#E84B4B`,

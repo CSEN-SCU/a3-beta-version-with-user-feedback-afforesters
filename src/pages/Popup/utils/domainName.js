@@ -1,6 +1,8 @@
 export const extractDomainName = (url) => {
-  const re = new RegExp('^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)');
-  return re.exec(url)[1];
+  if (url === '') {
+    return '';
+  } else {
+    const re = new RegExp('^(?:https?://)?(?:[^@/\n]+@)?(?:www.)?([^:/?\n]+)');
+    return re.exec(url)[1];
+  }
 };
-
-
