@@ -34,6 +34,17 @@ const Popup = () => {
       setTime(time_minute);
       if (response.timeIsUp) {
         setTimeIsUp(true);
+
+        // let queryOptions = { active: true, currentWindow: true };
+        // let tab = await chrome.tabs.query(queryOptions);
+
+        // chrome.tabs.sendMessage(
+        //   tab[0].id,
+        //   { cmd: "TIME_IS_UP" },
+        //   function (response) {
+        //     console.log(response.status);
+        //   }
+        // );
         clearInterval(intervalRef.current);
       }
     }, 1000);
@@ -131,15 +142,21 @@ const Popup = () => {
         setCurrFocus={setCurrFocus}
         setTimeRange={startTimer}
       />
-
-      <div>
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option value="">--Select a Prority--</option>
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
-        <button onClick={handleClick}>Set Pority</button>
+      <div className="priority-wrapper">
+        <div className="box">
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value)}
+          >
+            <option value="">--Select a Priority--</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <button className="button-23" role="button" onClick={handleClick}>
+          Set Priority
+        </button>
       </div>
     </div>
   );

@@ -8,6 +8,12 @@
   }
   
   .edit-title {
+
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 22px;
+    color: #000000;
     margin: 10px;
   }
   
@@ -20,6 +26,7 @@
   }
   
   .time-input {
+    position:relative;
     display: inline-flex;
     flex-direction: row;
     align-items: center;
@@ -37,15 +44,12 @@
     padding-right: 20px;
     margin-right: 15px;
   }
-  
-  .edit-title {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 22px;
-    color: #000000;
+
+  .time-input div{
+    position:absolute;
+    margin-left:50%;
   }
+  
   
   #time-input-number {
     border: none;
@@ -63,8 +67,64 @@
 
   #svg-btn-plus{
     width: 65px;
+    transition: 0.2s all ease-in-out;
+  }
+
+  #svg-btn-plus:hover{
+    cursor:pointer;
+    transform: rotate(360deg) scale(110%);
+
   }
   
   #svg-btn-minus{
 
   }
+
+/* CSS */
+.button-23 {
+  background-color: #FFFFFF;
+  border: 1px solid #222222;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #222222;
+  cursor: pointer;
+  display: inline-block;
+  font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  margin: 0;
+  outline: none;
+  padding: 8px 15px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
+  user-select: none;
+  -webkit-user-select: none;
+  width: auto;
+  transition: 0.2s all ease-in-out;
+}
+
+.button-23:focus-visible {
+  box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
+  transition: box-shadow .2s;
+}
+
+.button-23:active {
+  background-color: #F7F7F7;
+  border-color: #000000;
+  transform: scale(.96);
+}
+
+.button-23:disabled {
+  border-color: #DDDDDD;
+  color: #DDDDDD;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.button-23:hover{
+  transform: scale(106%);
+}
