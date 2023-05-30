@@ -11,9 +11,25 @@ const extractDomainName = (url) => {
   }
 };
 
+const sendTimeUpToTabs = async () => {
+  const tabs = await chrome.tabs.query({});
+  console.log('show all tabs', tabs);
+
+  for (let i = 0; i < tabs.length; i++) {
+    const tab = tabs[i];
+    const tabDomainName = extractDomainName(tab.url);
+    console.log('shot ', tabDomainName, tab);
+    if (tabDomainName === timer.domainName) {
+      await chrome.tabs.sendMessage(tab.id, { cmd: 'TIME_IS_UP' });
+      console.log('shot time is up');
+    }
+  }
+};
+
 const timeIsUp = async () => {
   console.log('time is up!!!!');
   await timer.saveToStorage();
+  await sendTimeUpToTabs();
 };
 
 const startTimerReqHandler = (request) => {
@@ -239,7 +255,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 // event when tab is closed
 chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
   // await stopAndSaveCurrentTimer();
-  
+
   // Load the tabs from local storage
   chrome.storage.local.get(['tabs', 'groups', 'groupIds'], function (data) {
     let tabs = data.tabs || {};
@@ -305,9 +321,14 @@ const getUnfinishedTimer = async () => {
 const resumeUnfinishedTimer = async (previousTimer) => {
   console.log('RESTART_TIMER', previousTimer);
   const { domainName, tabIds, time, timeLimit, type } = previousTimer;
-  timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {
-    timeIsUp();
-  });
+  if (time >= timeLimit) {
+    timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {});
+  } else {
+    timer = new Timer(domainName, tabIds, time, timeLimit, type, () => {
+      timeIsUp();
+    });
+  }
+
   timer.start();
 };
 
