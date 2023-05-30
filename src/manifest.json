@@ -47,7 +47,9 @@
     "activeTab",
     "scripting",
     "tabs",
-    "tabGroups",
+    "tabGroups"
+  ],
+  "host_permissions": [
     "http://*/*",
     "https://*/*",
     "<all_urls>"
