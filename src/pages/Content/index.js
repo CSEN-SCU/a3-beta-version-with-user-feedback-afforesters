@@ -34,11 +34,12 @@ const checkIfBlockCurrentPage = async () => {
 
 checkIfBlockCurrentPage();
 
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-//   if (request.cmd === 'TIME_IS_UP') {
-//     blockScreen();
-//   }
-// });
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log('receive: ', request);
+  if (request.cmd === 'TIME_IS_UP') {
+    blockScreen();
+  }
+});
 
 // Function to block the screen
 function blockScreen() {
