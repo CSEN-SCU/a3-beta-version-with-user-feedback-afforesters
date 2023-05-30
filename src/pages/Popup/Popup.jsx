@@ -69,13 +69,13 @@ const Popup = () => {
     [currFocus, domainName, subscribeTimer]
   );
 
-  const handleClick = () => {
+  const handleClick = (newPriority) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
       chrome.runtime.sendMessage(
         {
           cmd: 'setPriority',
-          priority: priority,
+          priority: newPriority,
           tabId: tabId,
         },
         (response) => {
@@ -84,6 +84,7 @@ const Popup = () => {
       );
     });
   };
+
 
   const init = useCallback(async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -143,21 +144,39 @@ const Popup = () => {
         setTimeRange={startTimer}
       />
       <div className="priority-wrapper">
-        <div className="box">
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+        <h2 style={{ textAlign: 'left' }}>Set Tab Priority</h2>
+        <div className='priority-btn-wrapper'>
+          <button
+            className="circle-button low"
+            onClick={() => {
+              setPriority("low");
+              handleClick("low");
+            }}
           >
-            <option value="">--Select a Priority--</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
+            Low
+          </button>
+          <button
+            className="circle-button medium"
+            onClick={() => {
+              setPriority("medium");
+              handleClick("medium");
+            }}
+          >
+            Med
+          </button>
+          <button
+            className="circle-button high"
+            onClick={() => {
+              setPriority("high");
+              handleClick("high");
+            }}
+          >
+            High
+          </button>
         </div>
-        <button className="button-23" role="button" onClick={handleClick}>
-          Set Priority
-        </button>
       </div>
+
+
     </div>
   );
 };
