@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import SvgIconPlus from '../assets/SvgIconMinus';
 import SvgIconMark from '../assets/SvgIconMark';
 import './index.css';
@@ -20,6 +20,7 @@ const EditCard = ({
   setTimeRange,
 }) => {
   const isFocused = useMemo(() => currFocus === name, [currFocus, name]);
+  const [isRunning, setIsRunning] = useState(false);
 
   const focusHandler = () => {
     isFocused ? setCurrFocus('') : setCurrFocus(name);
@@ -31,7 +32,8 @@ const EditCard = ({
 
   const startHandler = useCallback(() => {
     setTimeRange(value);
-  }, [setTimeRange, value]);
+    setIsRunning(!isRunning);
+  }, [value, setTimeRange, isRunning]);
 
   return (
     <div className="edit-card" style={isFocused ? styles.focused : {}}>
@@ -58,7 +60,7 @@ const EditCard = ({
           disabled={!isFocused}
           onClick={startHandler}
         >
-          start
+          {isRunning ? 'PAUSE' : 'START'}
         </button>
       </div>
     </div>
