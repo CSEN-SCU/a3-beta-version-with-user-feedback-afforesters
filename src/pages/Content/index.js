@@ -3,8 +3,6 @@ console.log('Running Content Script');
 console.log('Content script works!');
 console.log('Must reload extension for modifications to take effect.');
 
-let isBlocked = false;
-
 const extractDomainName = (url) => {
   if (url === '') {
     return '';
@@ -66,7 +64,7 @@ function blockScreen() {
   const unblockDiv = document.createElement('button');
   unblockDiv.classList.add('rainbow');
   unblockDiv.textContent = 'Close Tab';
-  unblockDiv.style.position = 'absolute';
+  unblockDiv.style.position = 'fixed';
   unblockDiv.style.textAlign = 'center';
   unblockDiv.style.height = '10vh';
   unblockDiv.style.width = '10vh';
@@ -76,18 +74,18 @@ function blockScreen() {
   unblockDiv.style.margin = '0';
   unblockDiv.style.transform = 'translate(-50%, -50%)';
 
-  const unblockDiv2 = document.createElement('button');
-  unblockDiv2.classList.add('rainbow');
-  unblockDiv2.textContent = 'Reset Timer';
-  unblockDiv2.style.position = 'absolute';
-  unblockDiv2.style.textAlign = 'center';
-  unblockDiv2.style.height = '10vh';
-  unblockDiv2.style.width = '10vh';
-  unblockDiv2.style.zIndex = '10001';
-  unblockDiv2.style.top = '80%';
-  unblockDiv2.style.left = '50%';
-  unblockDiv2.style.margin = '0';
-  unblockDiv2.style.transform = 'translate(-50%, -50%)';
+  // const unblockDiv2 = document.createElement('button');
+  // unblockDiv2.classList.add('rainbow');
+  // unblockDiv2.textContent = 'Reset Timer';
+  // unblockDiv2.style.position = 'absolute';
+  // unblockDiv2.style.textAlign = 'center';
+  // unblockDiv2.style.height = '10vh';
+  // unblockDiv2.style.width = '10vh';
+  // unblockDiv2.style.zIndex = '10001';
+  // unblockDiv2.style.top = '80%';
+  // unblockDiv2.style.left = '50%';
+  // unblockDiv2.style.margin = '0';
+  // unblockDiv2.style.transform = 'translate(-50%, -50%)';
   //unblockDiv.style.backgroundColor = 'white';
   // Add event listener to the button
   unblockDiv.addEventListener('click', () => {
@@ -95,21 +93,21 @@ function blockScreen() {
     window.close();
   });
 
-  unblockDiv2.addEventListener('click', async () => {
-    // Close the current tab
-    document.body.removeChild(blockerDiv);
-    document.body.removeChild(img);
-    document.body.removeChild(unblockDiv);
-    document.body.removeChild(unblockDiv2);
+  // unblockDiv2.addEventListener('click', async () => {
+  //   // Close the current tab
+  //   document.body.removeChild(blockerDiv);
+  //   document.body.removeChild(img);
+  //   document.body.removeChild(unblockDiv);
+  //   document.body.removeChild(unblockDiv2);
 
-    await chrome.runtime.sendMessage({
-      from: 'content',
-      cmd: 'RESET_TIMER',
-    });
-  });
+  //   await chrome.runtime.sendMessage({
+  //     from: 'content',
+  //     cmd: 'RESET_TIMER',
+  //   });
+  // });
 
   document.body.appendChild(blockerDiv);
   document.body.appendChild(img);
   document.body.appendChild(unblockDiv);
-  document.body.appendChild(unblockDiv2);
+  // document.body.appendChild(unblockDiv2);
 }
