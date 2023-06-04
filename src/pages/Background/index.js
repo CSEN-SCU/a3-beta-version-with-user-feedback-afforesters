@@ -41,6 +41,7 @@ const startTimerReqHandler = (request) => {
   });
   timer.start();
 
+  timer.saveToStorage();
   // todo save to local storage
   //
 };
