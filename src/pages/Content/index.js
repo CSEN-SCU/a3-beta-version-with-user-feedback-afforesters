@@ -3,6 +3,8 @@ console.log('Running Content Script');
 console.log('Content script works!');
 console.log('Must reload extension for modifications to take effect.');
 
+let isBlocked = false;
+
 const extractDomainName = (url) => {
   if (url === '') {
     return '';
@@ -77,7 +79,7 @@ function blockScreen() {
   // const unblockDiv2 = document.createElement('button');
   // unblockDiv2.classList.add('rainbow');
   // unblockDiv2.textContent = 'Reset Timer';
-  // unblockDiv2.style.position = 'absolute';
+  // unblockDiv2.style.position = 'fixed';
   // unblockDiv2.style.textAlign = 'center';
   // unblockDiv2.style.height = '10vh';
   // unblockDiv2.style.width = '10vh';

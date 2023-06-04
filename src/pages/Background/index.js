@@ -32,7 +32,7 @@ const timeIsUp = async () => {
   await sendTimeUpToTabs();
 };
 
-const startTimerReqHandler = (request) => {
+const startTimerReqHandler = async (request) => {
   const { domainName, timeRange, tabId, timerType } = request;
   console.log('START_TIMER', domainName, timeRange, tabId);
 
@@ -41,7 +41,7 @@ const startTimerReqHandler = (request) => {
   });
   timer.start();
 
-  timer.saveToStorage();
+  await timer.saveToStorage();
   // todo save to local storage
   //
 };
