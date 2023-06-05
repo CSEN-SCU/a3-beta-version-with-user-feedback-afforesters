@@ -16,9 +16,8 @@ const styles = {
 const Timer = ({ time, timeRange, timeIsUp, type = 'max' }) => {
   return (
     <div style={styles.body}>
-      {timeRange === 0 ? (
-        <p>No Limits Set</p>
-      ) : (
+      {timeRange === 0 && <p>No Limits Set</p>}
+      {timeRange !== 0 && (
         <h1 style={timeIsUp ? styles.red : styles.yellow}>
           {time}m/{timeRange}m
         </h1>
