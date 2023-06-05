@@ -1,9 +1,8 @@
 console.log('Running Content Script');
 
-console.log('Content script works!');
-console.log('Must reload extension for modifications to take effect.');
-
 let isBlocked = false;
+let isLocked = false;
+let beforeunloadListener = null;
 
 const extractDomainName = (url) => {
   if (url === '') {
@@ -17,18 +16,51 @@ const extractDomainName = (url) => {
 const domainName = extractDomainName(window.location.href);
 console.log('domainName', domainName);
 
+const setTabTitle = (locked) => {
+  const titlePrefix = "🔒 ";
+  if (locked && !document.title.startsWith(titlePrefix)) {
+    document.title = titlePrefix + document.title;
+  } else if (!locked && document.title.startsWith(titlePrefix)) {
+    document.title = document.title.substring(titlePrefix.length);
+  }
+};
+
 const checkIfBlockCurrentPage = async () => {
   const { LOCAL_TIMERS } = await chrome.storage.local.get('LOCAL_TIMERS');
   const timers = JSON.parse(LOCAL_TIMERS);
   const timerKey = `timer-${domainName}`;
   const timer = timers[timerKey];
+  console.log('Checking if block current page', timer);
 
-  if (timer && timer.time >= timer.timeLimit && timer.type === 'max') {
-    blockScreen();
-    console.log('block current page');
-    isBlocked = true;
+  if (timer) {
+    if (timer.type === 'min' && timer.time < timer.timeLimit) {
+      console.log('Setting up min timer');
+      beforeunloadListener = function (e) {
+        console.log("Firing beforeunload listener");
+        e.preventDefault();
+        e.returnValue = 'You have a timer set for this page.';
+      };
+
+      console.log("Adding beforeunload listener");
+      window.addEventListener("beforeunload", beforeunloadListener, true);
+
+      // Remove the event listener once the minimum time has passed
+      setTimeout(function () {
+        console.log("Removing beforeunload listener");
+        window.removeEventListener("beforeunload", beforeunloadListener, true);
+      }, (timer.timeLimit - timer.time) * 1000);
+
+      isLocked = true;
+      setTabTitle(isLocked);
+    } else if (timer.time >= timer.timeLimit && timer.type === 'max') {
+      console.log('block current page');
+      blockScreen();
+      isBlocked = true;
+    }
   } else {
-    console.log('current page is not blocked');
+    console.log('no timer set');
+    isLocked = false;
+    setTabTitle(isLocked);
   }
 };
 
@@ -37,9 +69,27 @@ checkIfBlockCurrentPage();
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log('receive: ', request);
   if (request.cmd === 'TIME_IS_UP') {
-    blockScreen();
+      blockScreen();
+      isBlocked = true;
+    }
+  else {
+    console.log('no timer set');
+    isLocked = false;
+    setTabTitle(isLocked);
   }
 });
+
+checkIfBlockCurrentPage();
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log('receive: ', request);
+  if (request.cmd === 'TIME_IS_UP') {
+    blockScreen();
+  } else if (request.cmd === 'RESET_TIMER') {
+    isBlocked = false;
+  }
+});
+
 
 // Function to block the screen
 function blockScreen() {
@@ -93,6 +143,7 @@ function blockScreen() {
   unblockDiv.addEventListener('click', () => {
     // Close the current tab
     window.close();
+    isBlocked = false;
   });
 
   // unblockDiv2.addEventListener('click', async () => {
@@ -112,4 +163,5 @@ function blockScreen() {
   document.body.appendChild(img);
   // document.body.appendChild(unblockDiv);
   // document.body.appendChild(unblockDiv2);
+  isBlocked = true;
 }
