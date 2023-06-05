@@ -33,7 +33,11 @@ const EditCard = ({
 
   const startHandler = useCallback(() => {
     setTimeRange(value);
-    setIsRunning(!isRunning);
+    if (isRunning) {
+      // do nothing
+    } else {
+      setIsRunning(true);
+    }
   }, [setTimeRange, value, setIsRunning, isRunning]);
 
   return (
