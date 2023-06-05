@@ -15,6 +15,7 @@ const Popup = () => {
   const [timeRange, setTimeRange] = useState(0);
   const [timeIsUp, setTimeIsUp] = useState(false);
   const [type, setType] = useState('max'); // default timer type max
+  const [isRunning, setIsRunning] = useState(false);
 
   const tabIdRef = useRef();
   const intervalRef = useRef(null);
@@ -93,7 +94,6 @@ const Popup = () => {
     });
   };
 
-
   const init = useCallback(async () => {
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     const _domainName = extractDomainName(tabs[0].url);
@@ -112,7 +112,7 @@ const Popup = () => {
       setCurrFocus(timerType);
       setType(timerType);
       setTimeRange(timeLimit / 60); // seconds to minutes
-
+      setIsRunning(true);
       if (timerType === 'max') {
         setMax(timeLimit / 60);
         setType('max');
@@ -150,6 +150,8 @@ const Popup = () => {
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
         setTimeRange={startTimer}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
       />
 
       <EditCard
@@ -160,9 +162,15 @@ const Popup = () => {
         currFocus={currFocus}
         setCurrFocus={setCurrFocus}
         setTimeRange={startTimer}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
       />
 
-      <PriorityButtons priority={priority} setPriority={setPriority} handleClick={handleClick} />
+      <PriorityButtons
+        priority={priority}
+        setPriority={setPriority}
+        handleClick={handleClick}
+      />
     </div>
   );
 };
