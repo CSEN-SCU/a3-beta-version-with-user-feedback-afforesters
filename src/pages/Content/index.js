@@ -110,6 +110,6 @@ function blockScreen() {
 
   document.body.appendChild(blockerDiv);
   document.body.appendChild(img);
-  document.body.appendChild(unblockDiv);
+  // document.body.appendChild(unblockDiv);
   // document.body.appendChild(unblockDiv2);
 }
