@@ -415,3 +415,13 @@ class Timer {
     await chrome.storage.local.set({ LOCAL_TIMERS: value });
   }
 }
+
+chrome.alarms.create('TIMER', {
+  periodInMinutes: 1 / 60,
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'TIMER') {
+    console.log('***************** Timer ***************');
+  }
+});
