@@ -36,6 +36,15 @@ const startTimerReqHandler = async (request) => {
   const { domainName, timeRange, tabId, timerType } = request;
   console.log('START_TIMER', domainName, timeRange, tabId);
 
+  if (timer !== null) {
+    try {
+      timer.stop();
+      timer = null;
+    } catch (error) {
+      console.log('timer stop error', error);
+    }
+  }
+  
   timer = new Timer(domainName, [tabId], 0, timeRange, timerType, () => {
     timeIsUp();
   });
@@ -70,19 +79,6 @@ const checkTimerExistHandler = (request, sendResponse) => {
     console.log('isTimerExist', false);
     sendResponse({ isTimerExist: false });
   }
-};
-
-const setTimeBlock = () => {
-  console.log('sending block message ...');
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(
-      tabs[0].id,
-      { cmd: 'TIME_IS_UP' },
-      function (response) {
-        console.log(response.status);
-      }
-    );
-  });
 };
 
 // Function to update the groups status
